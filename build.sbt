@@ -6,7 +6,7 @@ mimaFailOnNoPrevious in ThisBuild := false
 val mimaPreviousVersion = "1.0.0"
 
 val defaultSettings = Seq(
-  scalaVersion := "2.12.12",
+  scalaVersion := "2.12.13",
   crossScalaVersions := List("2.12.12", "2.13.3"),
   resolvers += Resolver.sonatypeRepo("releases"),
   homepage := Some(url("http://monovore.com/decline")),
@@ -68,17 +68,17 @@ lazy val noPublishSettings = Seq(
   publishArtifact := false
 )
 
-val catsVersion = "2.4.1"
+val catsVersion = "2.4.2"
 val catsEffectVersion = "2.3.1"
 
 lazy val root =
   project.in(file("."))
-    .aggregate(declineJS, declineJVM, refinedJS, refinedJVM, effectJS, effectJVM, enumeratumJS, enumeratumJVM, doc)
+    .aggregate(declineJS, declineJVM, declineNative, refinedJS, refinedJVM, effectJS, effectJVM, enumeratumJS, enumeratumJVM, doc)
     .settings(defaultSettings)
     .settings(noPublishSettings)
 
 lazy val decline =
-  crossProject(JSPlatform, JVMPlatform).in(file("core"))
+  crossProject(JSPlatform, JVMPlatform, NativePlatform).in(file("core"))
     .settings(defaultSettings)
     .settings(
       addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full)
@@ -89,7 +89,7 @@ lazy val decline =
       libraryDependencies ++= Seq(
         "org.typelevel"  %%% "cats-core"            % catsVersion,
         "org.typelevel"  %%% "cats-laws"            % catsVersion % Test,
-        "org.typelevel"  %%% "discipline-scalatest" % "2.1.1"  % Test
+        /* "org.typelevel"  %%% "discipline-scalatest" % "2.1.1"  % Test */
       ),
     )
     .jvmSettings(
@@ -103,6 +103,7 @@ lazy val decline =
 lazy val declineJVM = decline.jvm
 lazy val declineJS = decline.js
     .enablePlugins(ScalaJSPlugin)
+lazy val declineNative = decline.native.enablePlugins(ScalaNativePlugin)
 
 lazy val bench =
   project.in(file("bench"))
